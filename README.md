@@ -66,7 +66,7 @@ Launch a process and print the heap state at each instruction.
 Launch a process and print the heap state at each SYSCALL.
 
 ```bash
-./heapView NORMAL SYSCALL test/poc
+./heapView NORMAL SYSCALL "/usr/bin/pwd"
 ```
 
 ![normal_syscall](gif/normal_syscall.gif)
