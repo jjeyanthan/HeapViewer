@@ -1,6 +1,6 @@
 # HeapViewer
 
-HeapViewer is small tool to visualize the heap using ptrace. 
+HeapViewer is small tool to visualize the heap state of a program using ptrace. 
 
 The goal is to print all the heap chunks until my estimated top chunk is met.
 
@@ -55,7 +55,7 @@ SYSCALL: print heap whenever a SYSCALL happen
 
 ## DEMO
 
-NORMAL MODE with single step
+Launch a process and print the heap state at each instruction.
 
 ```bash
 ./heapView NORMAL SSTEP test/poc
@@ -63,7 +63,7 @@ NORMAL MODE with single step
 
 ![normal_sstep](gif/normal_sstep.gif)
 
-NORMAL MODE with SYSCALL
+Launch a process and print the heap state at each SYSCALL.
 
 ```bash
 ./heapView NORMAL SYSCALL test/poc
@@ -72,7 +72,7 @@ NORMAL MODE with SYSCALL
 ![normal_syscall](gif/normal_syscall.gif)
 
 
-ATTACH MODE with SYSCALL
+ATTACH to an existing program and print the heap state at each SYSCALL
 
 ```bash
 ./heapView ATTACH SYSCALL mate-calc-cmd $(pidof mate-calc-cmd)
