@@ -47,16 +47,6 @@
 #define USER_PTRACE_SINGLESTEP 0
 #define USER_PTRACE_SYSCALL 0
 #define MAX_ARG 10
-/*
-
-afficher le contenu du processus pere dans un autre terminal // /usr/bin/qterminal  puis dup2    OK
-affichage simplifier de la heap si chunk vide  													 OK
-afficher les chunk non vide  en couleur par taille    										     OK
-ajouter options pour choisir => par PID / affichage par instruction / par syscall				 OK 
-ajouter si argument contient espace recup que partie1										     OK
-
-*/
-
 
 
 // retrieve heap start and end address via /proc/pid/maps
@@ -64,7 +54,7 @@ int checkProcMaps(int child_pid, unsigned long *heap_start_address, unsigned lon
 	char path_proc[MAX_PATH_SIZE];  // 
 	char *proc_mp = "/proc/";
 	char *mps = "/maps";
-	snprintf(path_proc, sizeof(path_proc), "%s%lu%s", proc_mp, child_pid, mps);
+	snprintf(path_proc, sizeof(path_proc), "%s%d%s", proc_mp, child_pid, mps);
 	FILE *f = fopen(path_proc,"r");
 	 if ( f == NULL ) {
         printf( "Cannot open file %s\n", path_proc );
@@ -99,7 +89,7 @@ int find_binary_txt_section(int child_pid, char *binary_path_name , unsigned lon
 	char path_proc[MAX_PATH_SIZE];  
 	char *proc_mp = "/proc/";
 	char *mps = "/maps";
-	snprintf(path_proc, sizeof(path_proc), "%s%lu%s", proc_mp, child_pid, mps);
+	snprintf(path_proc, sizeof(path_proc), "%s%d%s", proc_mp, child_pid, mps);
 	FILE *f = fopen(path_proc,"r");
 	
 	char *proc_maps_info = malloc(3000);
@@ -309,7 +299,7 @@ void traceMyBinary(char *myBinary, char *binaryArguments[], int isPTRACE_SYSCALL
 		while(status!=-1){ 
 
 			if(ptrace(PTRACE_GETREGS, pid, 0, &uregs)!=0){
-				printf("\n[+] Exit... PC=%p\n",uregs.rip);
+				printf("\n[+] Exit... PC=%llx\n",uregs.rip);
 				exit(0);
 			}
 			else{
@@ -320,7 +310,7 @@ void traceMyBinary(char *myBinary, char *binaryArguments[], int isPTRACE_SYSCALL
 					if(isPTRACE_SYSCALL || (uregs.rip >= binary_st_addr && uregs.rip <= binary_end_addr)){ // print only when pc point inside binary
 						
 						if(heap_found){
-							printf("PRINTED HEAP %d\n", cpt_print_heap);
+							printf("PRINTED HEAP %ld\n", cpt_print_heap);
 							print_heap(pid,heap_st_addr,  heap_end_addr);
 							sleep(0.4);
 							if(cpt_print_heap % 1000 == 0){
@@ -366,7 +356,7 @@ void attachBinary(char *binary_path, int pid_to_attach,int isPTRACE_SYSCALL ,uns
 	waitpid(pid_to_attach, &status, WUNTRACED);	
 	while(status!=-1){
 		if(ptrace(PTRACE_GETREGS, pid_to_attach, 0, &uregs)!=0){
-				printf("\n[+] Exit.. PC=%p\n",uregs.rip);
+				printf("\n[+] Exit.. PC=%llx\n",uregs.rip);
 				exit(0);
 		}else{
 			if(binary_st_addr ==0 && binary_end_addr == 0){
@@ -376,7 +366,7 @@ void attachBinary(char *binary_path, int pid_to_attach,int isPTRACE_SYSCALL ,uns
 				if(isPTRACE_SYSCALL || (uregs.rip >= binary_st_addr && uregs.rip <= binary_end_addr)){ // print only when pc point inside binary
 							
 					if(heap_found){
-						printf("PRINTED HEAP %d\n", cpt_print_heap);
+						printf("PRINTED HEAP %ld\n", cpt_print_heap);
 						print_heap(pid_to_attach,heap_st_addr, heap_end_addr);
 					
 						sleep(0.7);
@@ -397,15 +387,15 @@ void attachBinary(char *binary_path, int pid_to_attach,int isPTRACE_SYSCALL ,uns
 
 // menu
 void help(){
-		puts("usage: ./heapView MODE TYPE BINARY_NAME \n");
+		puts("usage: ./heapView MODE PRINT_MODE BINARY_NAME \n");
 		puts("MODE:\n");
 		puts(GREEN);
-		puts("NORMAL:  [SINGLE|SYSCALL] BINARY_NAME\n");
+		puts("NORMAL:  [SSTEP|SYSCALL] BINARY_NAME\n");
 		puts("\tex: ./heapView NORMAL SSTEP PATH_TO_BINARY_NAME\n");
 		puts("\tex: ./heapView NORMAL SYSCALL PATH_TO_BINARY_NAME\n\n");
 		puts(NEUTRAL);
 		puts(BLUE);
-		puts("ATTACH:  [SINGLE|SYSCALL] BINARY_NAME PID\n");
+		puts("ATTACH:  [SSTEP|SYSCALL] BINARY_NAME PID\n");
 		puts("\tex: ./heapView ATTACH SSTEP PATH_TO_BINARY_NAME PID\n");
 		puts("\tex: ./heapView ATTACH SYSCALL PATH_TO_BINARY_NAME PID\n");
 		puts(NEUTRAL);
