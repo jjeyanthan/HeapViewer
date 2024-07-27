@@ -14,7 +14,7 @@ HeapViewer allows you to print the heap state at :
 
 
 > [!WARNING]  
-> Printing the heap state at each instruction is VERY SLOW due to usage of PTRACE_SINGLESTEP. Do not use it on medium/large binary ! 
+> Printing the heap state at each instruction is VERY SLOW due to the usage of PTRACE_SINGLESTEP. Do not use on medium/large binary ! 
 
 
 ## Installation
@@ -50,20 +50,32 @@ SYSCALL: print heap whenever a SYSCALL happen
 ```
 
 > [!NOTE]  
-> In some cases due to kernel hardening , PTRACE_ATTACH may required sudo privileges => echo 0 > /proc/sys/kernel/yama/ptrace_scope
+> In some cases due to kernel hardening , PTRACE_ATTACH may required sudo privileges 
 
 
 ## DEMO
 
 NORMAL MODE with single step
 
+```bash
+./heapView NORMAL SSTEP test/poc
+```
+
 ![normal_sstep](gif/normal_sstep.gif)
 
 NORMAL MODE with SYSCALL
+
+```bash
+./heapView NORMAL SYSCALL test/poc
+```
 
 ![normal_syscall](gif/normal_syscall.gif)
 
 
 ATTACH MODE with SYSCALL
+
+```bash
+./heapView ATTACH SYSCALL mate-calc-cmd $(pidof mate-calc-cmd)
+```
 
 ![attach_syscall](gif/attach_syscall.gif)
